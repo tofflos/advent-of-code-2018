@@ -52,12 +52,10 @@ public class Main {
 
         Function<List<Integer>, Integer> function = integers -> {
             var history = new HashSet<Integer>();
-
             var acc = 0;
 
             for (var idx = 0;; idx++) {
-                var cur = integers.get(idx % integers.size());
-                acc = acc + cur;
+                acc = acc + integers.get(idx % integers.size());
 
                 if (history.contains(acc)) {
                     return acc;
