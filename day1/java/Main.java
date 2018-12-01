@@ -54,10 +54,9 @@ public class Main {
             var history = new HashSet<Integer>();
 
             var acc = 0;
-            var idx = 0;
 
-            while (true) {
-                var cur = integers.get(idx);
+            for (var idx = 0;; idx++) {
+                var cur = integers.get(idx % integers.size());
                 acc = acc + cur;
 
                 if (history.contains(acc)) {
@@ -65,11 +64,6 @@ public class Main {
                 }
 
                 history.add(acc);
-                idx++;
-
-                if (idx == integers.size()) {
-                    idx = 0;
-                }
             }
         };
 
