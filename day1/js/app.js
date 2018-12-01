@@ -8,7 +8,7 @@ console.log("Part one: " + offsets.reduce((acc, cur) => acc + cur));
 // Part two
 
 function firstDuplicate(arr) {
-    const history = [];
+    const history = new Set();
 
     let acc = 0;
     let idx = 0;
@@ -17,11 +17,11 @@ function firstDuplicate(arr) {
         let cur = arr[idx];
         acc = acc + cur;
 
-        if (history.includes(acc)) {
+        if (history.has(acc)) {
             return acc;
         }
 
-        history.push(acc);
+        history.add(acc);
         idx++;
 
         if (idx === arr.length) {
