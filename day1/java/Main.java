@@ -47,7 +47,7 @@ public class Main {
                 -13, 10, -3, -17, 4, 23, 16, -7, -30, 29, -19, 18, -3, 20, -7, -3, 77, 1, 42, 18, 9, -1, 23, 57, 8, -12,
                 1, 5, 12, 3, 10, -1, 14, 20, -7, -3, -14, -12, 9, 16, 16, 12, 14, 11, 11, 2, 1, 19, -10, 18, -17, -9,
                 -11, -8, 10, -1, -110292);
-                
+
         var example_offsets = List.of(1, -2, 3, 1);
 
         Function<List<Integer>, Integer> function = integers -> {
@@ -73,7 +73,7 @@ public class Main {
             }
         };
 
-        // Part one - Testing solution against example offsets
+        // Part one
         System.out.println("Part one: " + offsets.stream().reduce(Integer::sum).get());
 
         // Part two - Testing solution against example offsets
