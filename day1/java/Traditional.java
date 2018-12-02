@@ -48,30 +48,25 @@ public class Main {
                 1, 5, 12, 3, 10, -1, 14, 20, -7, -3, -14, -12, 9, 16, 16, 12, 14, 11, 11, 2, 1, 19, -10, 18, -17, -9,
                 -11, -8, 10, -1, -110292);
 
-        var example_offsets = List.of(1, -2, 3, 1);
-
-        Function<List<Integer>, Integer> function = integers -> {
-            var history = new HashSet<Integer>();
-            var acc = 0;
-
-            for (var idx = 0;; idx++) {
-                acc = acc + integers.get(idx % integers.size());
-
-                if (history.contains(acc)) {
-                    return acc;
-                }
-
-                history.add(acc);
-            }
-        };
-
         // Part one
         System.out.println("Part one: " + offsets.stream().reduce(Integer::sum).get());
 
-        // Part two - Testing solution against example offsets
-        System.out.println("Part two (example): " + function.apply(example_offsets));
+        // Part two
+        System.out.println("Part two: " + firstDuplicate(offsets));
+    }
 
-        // Part two - Testing solution against challenge offsets
-        System.out.println("Part two (challenge): " + function.apply(offsets));
+    private static Integer firstDuplicate(List<Integer> integers) {
+        var history = new HashSet<Integer>();
+        var acc = 0;
+
+        for (var idx = 0;; idx++) {
+            acc = acc + integers.get(idx % integers.size());
+
+            if (history.contains(acc)) {
+                return acc;
+            }
+
+            history.add(acc);
+        }
     }
 }
