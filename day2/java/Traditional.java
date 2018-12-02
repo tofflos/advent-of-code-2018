@@ -50,7 +50,7 @@ public class Traditional {
             }
         }
 
-        System.out.println("Part two: " + removeDiffernces(box1, box2));
+        System.out.println("Part two: " + removeDifferences(box1, box2));
     }
 
     private static Map<String, Integer> countLetters(String letters) {
