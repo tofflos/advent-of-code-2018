@@ -83,7 +83,7 @@ public class Traditional {
         return true;
     }
 
-    private static String removeDiffernces(String box1, String box2) {
+    private static String removeDifferences(String box1, String box2) {
         var sb = new StringBuffer();
         
         for (int i = 0; i < box1.length(); i++) {
