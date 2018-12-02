@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public class Main {
+public class Functional {
 
     public static void main(String[] args) {
 
@@ -33,7 +33,7 @@ public class Main {
         };
 
         var unseen = new Predicate<Integer>() {
-            Set<Integer> history = new HashSet();
+            Set<Integer> history = new HashSet<>();
 
             @Override
             public boolean test(Integer frequency) {
