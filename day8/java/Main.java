@@ -4,13 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Iterator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Main {
-
-    static int cursor = 0;
 
     public static void main(String[] args) throws IOException {
         String license = Files.readString(Paths.get("8.in"));
@@ -19,21 +17,21 @@ public class Main {
                 .map(Integer::parseInt)
                 .collect(Collectors.toList());
 
-        var root = parse(numbers);
+        var root = parse(numbers.iterator());
 
         System.out.println("Part one: " + sum(root));
         System.out.println("Part two: " + complicatedSum(root));
     }
 
-    static Node parse(List<Integer> numbers) {
-        var node = new Node(numbers.get(cursor++), numbers.get(cursor++));
+    static Node parse(Iterator<Integer> iterator) {
+        var node = new Node(iterator.next(), iterator.next());
 
         for (int i = 0; i < node.children.length; i++) {
-            node.children[i] = parse(numbers);
+            node.children[i] = parse(iterator);
         }
 
         for (int i = 0; i < node.entries.length; i++) {
-            node.entries[i] = numbers.get(cursor++);
+            node.entries[i] = iterator.next();
         }
 
         return node;
@@ -54,8 +52,6 @@ public class Main {
     }
     
     static int complicatedSum(Node node) {
-        System.out.println(node);
-
         if(node.children.length == 0) {
             return Arrays.stream(node.entries).reduce(Integer::sum).getAsInt();
         }
