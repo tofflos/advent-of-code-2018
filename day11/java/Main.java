@@ -7,6 +7,7 @@ public class Main {
     public static void main(String[] args) {
         var square1 = largestSquare(3, 5235);
         var square2 = IntStream.range(1, 301)
+                .parallel()
                 .mapToObj(i -> largestSquare(i, 5235))
                 .max((a, b) -> Integer.compare(a.power, b.power)).get();
 
