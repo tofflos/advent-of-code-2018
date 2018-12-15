@@ -5,7 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -15,7 +17,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        var parser = new BiConsumer<List<Range>, String>() {
+        var biconsumer = new BiConsumer<List<Range>, String>() {
             Pattern begins = Pattern.compile(".*#(\\d+) begins shift");
 
             int guard, start, stop;
@@ -35,43 +37,46 @@ public class Main {
             }
         };
 
-        Collector<String, ?, List<Range>> collector = Collector.of(ArrayList::new,
-                parser,
-                (left, right) -> {
-                    left.addAll(right);
-                    return left;
-                });
+        var collector = Collector.of(ArrayList::new, biconsumer, (left, right) -> {
+            left.addAll(right);
+            return left;
+        });
 
         var ranges = Files.readAllLines(Paths.get("4.in")).stream().sorted().collect(collector);
 
-        var guards_ranges = ranges.stream().collect(Collectors.groupingBy(r -> r.guard));
+        var guards_accumulated_sleep = ranges.stream().collect(Collectors.toMap(r -> r.guard, r -> r.stop - r.start, Integer::sum));
+        var sleepiest_guard = guards_accumulated_sleep.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
+        var sleepiest_minute = ranges.stream().filter(r -> r.guard == sleepiest_guard)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Main::sleepiest_minute));
 
-        var guards_aggregatedSleep = ranges.stream().collect(
-                Collectors.groupingBy(r -> r.guard,
-                        Collectors.mapping(r -> r.stop - r.start,
-                                Collectors.reducing(Integer::sum))));
+        System.out.println("Part one: " + sleepiest_guard * sleepiest_minute);
 
-        var guard = guards_aggregatedSleep.entrySet().stream()
-                .max((a, b) -> Integer.compare(a.getValue().get(), b.getValue().get())).get().getKey();
+        var sleepiest_minutes = ranges.stream().collect(Collectors.groupingBy(r -> r.guard,
+                Collectors.collectingAndThen(Collectors.toList(), Main::sleepiest_minute)));
 
-        var guards_minutes = guards_ranges.entrySet().stream().collect(Collectors.toMap(r -> r.getKey(), e -> occurrences(e.getValue())));
+        var highest_sleep_occurrences = ranges.stream().collect(Collectors.groupingBy(r -> r.guard,
+                Collectors.collectingAndThen(Collectors.toList(), Main::highest_sleep_count)));
 
-        var sleep_max_occurrences = guards_minutes.get(guard).stream().max(Integer::compare).get();
-        var sleep_max_minute = guards_minutes.get(guard).indexOf(sleep_max_occurrences);
+        var most_predictable_guard = highest_sleep_occurrences.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
+        var most_predictable_minute = sleepiest_minutes.get(most_predictable_guard);
 
-        System.out.println("Part one: " + guard * sleep_max_minute);
+        System.out.println("Part two: " + most_predictable_guard * most_predictable_minute);
     }
 
-    static List<Integer> occurrences(List<Range> ranges) {
-        List<Integer> minutes = IntStream.of(new int[60]).boxed().collect(Collectors.toList());
+    static int highest_sleep_count(List<Range> ranges) {
+        var minutes = IntStream.range(0, 60)
+                .boxed()
+                .collect(Collectors.toMap(Function.identity(), i -> ranges.stream().filter(r -> r.start <= i && i < r.stop).count()));
+     
+        return minutes.entrySet().stream().max(Map.Entry.comparingByValue()).get().getValue().intValue();
+    }
 
-        IntStream.range(0, 60).forEach(minute -> {
-            ranges.stream()
-                    .filter(r -> r.start <= minute && minute < r.stop)
-                    .forEach(r -> minutes.set(minute, minutes.get(minute) + 1));
-        });
+    static int sleepiest_minute(List<Range> ranges) {
+        Map<Integer, Long> minutes = IntStream.range(0, 60)
+                .boxed()
+                .collect(Collectors.toMap(Function.identity(), i -> ranges.stream().filter(r -> r.start <= i && i < r.stop).count()));
 
-        return minutes;
+        return minutes.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
     }
 }
 
