@@ -46,31 +46,29 @@ const circularBuffer = (size) => {
     return {
         count: () => cursor,
         indexOf: (...digits) => {
-            let matches = 0;
+            let b = true;
 
             for (let i = 0; i < digits.length; i++) {
-                if (buffer[(cursor + i) % buffer.length] === digits[i]) {
-                    matches++;
-                } else {
+                if (buffer[(cursor + i) % buffer.length] !== digits[i]) {
+                    b = false;
                     break;
                 }
             }
 
-            if (matches === digits.length) {
+            if (b) {
                 return 1;
             }
 
-            matches = 0;
+            b = true;
 
             for (let i = 0; i < digits.length; i++) {
-                if (buffer[(cursor + i + 1) % buffer.length] === digits[i]) {
-                    matches++;
-                } else {
+                if (buffer[(cursor + i + 1) % buffer.length] !== digits[i]) {
+                    b = false;
                     break;
                 }
             }
 
-            if (matches === digits.length) {
+            if (b) {
                 return 0;
             }
 
