@@ -14,7 +14,7 @@ const part1 = (rounds) => {
         elf2 = (elf2 + recipes[elf2] + 1) % recipes.length;
     }
 
-    return recipes.slice(rounds, rounds + 10);
+    return recipes.slice(rounds, rounds + 10).join("");
 }
 
-console.log("Part one: " + part1(157901).join(""))
+console.log("Part one: " + part1(157901));
