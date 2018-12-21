@@ -1,7 +1,7 @@
 "use strict";
 
 const fs = require("fs");
-const lines = fs.readFileSync("day17/js/examples1.in").toString().split("\r\n");
+const lines = fs.readFileSync("day17/js/17.in").toString().split("\r\n");
 const patternX = /x=(\d+), y=(\d+)..(\d+)/;
 const patternY = /y=(\d+), x=(\d+)..(\d+)/;
 
@@ -44,160 +44,80 @@ const maxX = Math.max(...clay.map(c => c.x))
 const minY = Math.min(...clay.map(c => c.y))
 const maxY = Math.max(...clay.map(c => c.y))
 
-// const ground = Array(maxY + 2).fill(0).map(() => Array(maxX + 3).fill('.'));
-const ground = Array(maxY + 100).fill(0).map(() => Array(maxX + 3).fill('.'));
-
-console.log(ground);
-
+const ground = Array(maxY + 2).fill(0).map(() => Array(maxX + 3).fill('.'));
 
 clay.forEach(p => {
     ground[p.y][p.x] = '#';
 });
 
-const fountains = [{ x: 500, y: 0 }];
+const fountains = [{ x: 500, y: minY - 1 }];
 
 fountains.forEach(p => {
     ground[p.y][p.x] = '+';
 })
 
-const waters = [];
+const flow = (x, y, parentY) => {
+    ground[y][x] = '|';
 
-const displayGround = (minX, maxX, minY, maxY) => {
-    for (let y = minY; y < maxY; y++) {
-        var s = "";
-        for (let x = minX; x < maxX; x++) {
-            s += ground[y][x] + " ";
-        }
-
-        console.log(s)
+    if (y >= maxY) {
+        return;
     }
-};
 
-for (let n = 0; n < 60; n++) {
-    // Move
-    waters.forEach(w => {
-        if (ground[w.y + 1][w.x] !== '#' && !waters.some((water) => w.x === water.x && w.y + 1 === water.y)) {
+    if (ground[y + 1][x] === '.') {
+        flow(x, y + 1, y);
+    }
 
+    if ((ground[y + 1][x] === '#' || ground[y + 1][x] === '~') && ground[y][x - 1] === '.') {
+        flow(x - 1, y, y);
+    }
 
-            ground[w.y][w.x] = '|'
-            w.y++;
-            ground[w.y][w.x] = '|';
-        } else if (w.d === "left") {
-            if (ground[w.y][w.x - 1] !== '#' && !waters.some((water) => w.x - 1 === water.x && w.y === water.y)) {
-                ground[w.y][w.x] = '|'
-                w.x--;
-                ground[w.y][w.x] = '|';
-            } else {
-                w.d = "right";
-                if (ground[w.y][w.x + 1] === '#' || waters.some((water) => w.x + 1 === water.x && w.y === water.y)) {
-                    ground[w.y][w.x] = '~';
-                } else {
-                    ground[w.y][w.x] = '|'
-                    w.x++;
-                    ground[w.y][w.x] = '|';
-                }
-            }
-        } else if (w.d === "right") {
-            if (ground[w.y][w.x + 1] !== '#' && !waters.some((water) => w.x + 1 === water.x && w.y === water.y)) {
-                ground[w.y][w.x] = '|'
-                w.x++;
-                ground[w.y][w.x] = '|';
-            } else {
-                w.d = "left";
-                if (ground[w.y][w.x - 1] === '#' || waters.some((water) => w.x - 1 === water.x && w.y === water.y)) {
-                    ground[w.y][w.x] = '~';
-                } else {
-                    ground[w.y][w.x] = '|'
-                    w.x--;
-                    ground[w.y][w.x] = '|';
-                }
-            }
+    if ((ground[y + 1][x] === '#' || ground[y + 1][x] === '~') && ground[y][x + 1] === '.') {
+        flow(x + 1, y, y);
+    }
+
+    if (y !== parentY) {
+        let arr = [];
+
+        let cursor1 = x;
+        while (ground[y][cursor1] === '|') {
+            arr.push({ x: cursor1--, y: y });
         }
-    })
 
-    // Create
-    fountains.forEach(f => {
-        if (ground[f.y + 1][f.x] !== '.' || !waters.includes([f.x, f.y + 1])) {
-            ground[f.y + 1][f.x] = '|';
-            waters.push({ x: f.x, y: f.y + 1, d: "left" });
-        } else {
-            console.log("Unable to create more water");
-            process.exit();
+        let cursor2 = x;
+        while (ground[y][cursor2] === '|') {
+            arr.push({ x: cursor2++, y: y });
         }
-    })
-
-    // let total = 0;
-
-    
-    // for (let i = 0; i < ground.length; i++) {
-    //     for (let j = 0; j < ground[i].length; j++) {
-    //         if (ground[i][j] === '|' || ground[i][j] === '~') {
-    //             total++;
-    //         }
-    //     }
-    // }
 
 
-    // Display
-    displayGround(494, 508, 0, 14);
-    // console.log("Total: " + total + ", " + n);
-    console.log("");
+        if (arr.every(p => ground[p.y + 1][p.x] === '#' || ground[p.y + 1][p.x] === '~')) {
+            arr.forEach(p => ground[p.y][p.x] = '~');
+        }
+
+    }
 }
 
+flow(500, minY);
 
+let total = 0;
 
-
-
-console.log(clay);
-console.log(ground);
-
-
-const family = [
-    { name: "Elin", age: 39 },
-    { name: "Erik", age: 40 },
-    { name: "Ylva", age: 9 }
-];
-
-const map = fn => items => {
-    let arr = [];
-
-    for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        arr.push(fn(item));
+for (let i = 0; i < ground.length; i++) {
+    for (let j = 0; j < ground[i].length; j++) {
+        if (ground[i][j] === '|' || ground[i][j] === '~') {
+            total++;
+        }
     }
+}
 
-    return arr;
-};
+console.log("Part one: " + total);
 
-const getProperty = key => member => member[key];
+let total2 = 0;
 
-const getAge = getProperty("age");
-const getName = getProperty("name");
+for (let i = 0; i < ground.length; i++) {
+    for (let j = 0; j < ground[i].length; j++) {
+        if (ground[i][j] === '~') {
+            total2++;
+        }
+    }
+}
 
-const getAges = map(getAge);
-const getNames = map(getName);
-
-const ages = getAges(family);
-const names = getNames(family);
-
-console.log(ages);
-console.log(names);
-
-// console.log(lines)
-// console.log(lines.filter(line => line.startsWith("x")))
-// console.log(ranges);
-
-// class Clay {
-//     constructor(x, y) {
-//         this.x = x;
-//         this.y = y;
-//     }
-// }
-
-// class Range {
-
-// }
-
-// class Water {
-
-// }
+console.log("Part two: " + total2);
