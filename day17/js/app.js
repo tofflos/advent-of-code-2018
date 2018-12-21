@@ -88,7 +88,6 @@ const flow = (x, y, parentY) => {
             arr.push({ x: cursor2++, y: y });
         }
 
-
         if (arr.every(p => ground[p.y + 1][p.x] === '#' || ground[p.y + 1][p.x] === '~')) {
             arr.forEach(p => ground[p.y][p.x] = '~');
         }
@@ -98,26 +97,5 @@ const flow = (x, y, parentY) => {
 
 flow(500, minY);
 
-let total = 0;
-
-for (let i = 0; i < ground.length; i++) {
-    for (let j = 0; j < ground[i].length; j++) {
-        if (ground[i][j] === '|' || ground[i][j] === '~') {
-            total++;
-        }
-    }
-}
-
-console.log("Part one: " + total);
-
-let total2 = 0;
-
-for (let i = 0; i < ground.length; i++) {
-    for (let j = 0; j < ground[i].length; j++) {
-        if (ground[i][j] === '~') {
-            total2++;
-        }
-    }
-}
-
-console.log("Part two: " + total2);
+console.log("Part one: " + ground.reduce((occurrences, row) => occurrences + row.filter(c => "|~".includes(c)).length, 0));
+console.log("Part two: " + ground.reduce((occurrences, row) => occurrences + row.filter(c => "~".includes(c)).length, 0));
