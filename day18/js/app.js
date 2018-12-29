@@ -60,15 +60,34 @@ const render = board => {
     console.log("");
 }
 
-const round = initial => {
+const calculateResources = board => {
+    let lumberyards = 0;
+    let woods = 0;
+
+    for (let y = 0; y < board.length; y++) {
+        for (let x = 0; x < board[y].length; x++) {
+            if (board[y][x] === "#") {
+                lumberyards++;
+            } else if (board[y][x] === "|") {
+                woods++;
+            }
+        }
+    }
+
+    return lumberyards * woods;
+}
+
+const round = (initial, rounds) => {
+
+    let history = [];
+
     let current = [];
     for (let y = 0; y < initial.length; y++) {
         current.push(initial[y].slice());
     }
 
-
-    for (let i = 0; i < 10; i++) {
-        render(current);
+    for (let i = 0; i < rounds; i++) {
+        // render(current);
         const next = [];
         for (let y = 0; y < current.length; y++) {
             next.push([]);
@@ -92,36 +111,34 @@ const round = initial => {
             }
         }
 
+        const resources = calculateResources(current);
+        const index1 = history.lastIndexOf(resources);
+
+        if (index1 !== -1) {
+            const index2 = history.lastIndexOf(resources, index1 - 1);
+
+            if (history.length - index1 === index1 - index2) {
+                return history.slice(index1)[(rounds - i) % (history.length - index1)];
+            } else {
+                history.push(resources);
+            }
+        } else {
+            history.push(resources);
+        }
+
         current = [];
         for (let y = 0; y < next.length; y++) {
             current.push(next[y].slice());
         }
     }
 
-    render(current);
+    // render(current);
 
-    let woods = 0;
-    for (let y = 0; y < current.length; y++) {
-        for (let x = 0; x < current[y].length; x++) {
-            if(current[y][x] === "|") {
-                woods++;
-            }
-        }
-    }
-
-    let lumberyards = 0;
-    for (let y = 0; y < current.length; y++) {
-        for (let x = 0; x < current[y].length; x++) {
-            if(current[y][x] === "#") {
-                lumberyards++;
-            }
-        }
-    }
-
-
-    return woods * lumberyards;
+    return calculateResources(current);
 }
 
-const resourceValue = round(board);
+const resources1 = round(board, 10);
+console.log("Part one: " + resources1);
 
-console.log("Part one: " + resourceValue);
+const resources2 = round(board, 1000000000);
+console.log("Part two: " + resources2);
